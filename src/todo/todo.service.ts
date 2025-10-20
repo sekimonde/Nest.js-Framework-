@@ -54,8 +54,8 @@ export class TodoService {
       where
     });
     
-
-    const pageCount = Math.ceil(total / limit) || 1;
+    
+    let pageCount =total===0?0:  Math.ceil(total/limit);
     const dataLength=data.length;
     const hasNextPage=page<pageCount;
     const hasPreviousPage=page>1;
@@ -97,7 +97,10 @@ export class TodoService {
   const [data, total] = await query.getManyAndCount();
     
 
-    const pageCount = Math.ceil(total / limit) || 1;
+let pageCount = Math.ceil(total / limit);
+    if (total===0){
+        pageCount=0;
+    }
     const dataLength=data.length;
     const hasNextPage=page<pageCount;
     const hasPreviousPage=page>1;
@@ -114,11 +117,7 @@ export class TodoService {
     }
   }
 
-
-
-
-
-  async getTodo(id: number): Promise<TodoEntity> {
+   getTodo(id: number): Promise<TodoEntity> {
     return this.checkTodoExist(id);
   }
 
@@ -136,7 +135,7 @@ export class TodoService {
         return  this.todoRepository.save(newTodo);
   }
 
-   async deleteTodo(id:number){
+   async deleteTodo(id:number): Promise<string>{
     const result=await this.todoRepository.delete(id);
     if (result.affected === 0) {
         throw new NotFoundException('Todo not found');
@@ -149,11 +148,12 @@ export class TodoService {
     return this.todoRepository.remove(todo);
 }
 
-  async softDeleteTodo(id:number){
+  async softDeleteTodo(id:number): Promise<string>{
     const result = await this.todoRepository.softDelete(id);
     if (result.affected === 0) {
         throw new NotFoundException('Todo not found');
     }
+    
     return "todo with id " + id + " soft deleted successfully";
                                 }
    
@@ -176,16 +176,18 @@ async restoreTodo(id: number): Promise<string> {
   /*Préparer une api permettant d’avoir en une seule requête le nombre de
 todo pour chacun des trois statues*/
 
-async getTodoCountByStatus(): Promise<{ [key: string]: number}> {
-     const pendingCount= await this.todoRepository.count({ where: { status: TodoStatus.PENDING } });
-     const inProgressCount= await this.todoRepository.count({ where: { status: TodoStatus.IN_PROGRESS } });
-     const doneCount= await this.todoRepository.count({ where: { status: TodoStatus.DONE } });
-    return {
-         [TodoStatus.PENDING]: pendingCount,
-        [TodoStatus.IN_PROGRESS]: inProgressCount,
-        [TodoStatus.DONE]: doneCount
-    };
-  }
+async getTodoCountByStatus() {
+  const pendingCount = await this.todoRepository.count({ where: { status: TodoStatus.PENDING } });
+  const inProgressCount = await this.todoRepository.count({ where: { status: TodoStatus.IN_PROGRESS } });
+  const doneCount = await this.todoRepository.count({ where: { status: TodoStatus.DONE } });
+
+  return {
+    [TodoStatus.PENDING]: pendingCount,
+    [TodoStatus.IN_PROGRESS]: inProgressCount,
+    [TodoStatus.DONE]: doneCount
+  };
+}
+
   
  
 }

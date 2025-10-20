@@ -1,10 +1,10 @@
 import { Inject, Injectable } from '@nestjs/common';
-import { UUID_GENERATOR } from 'src/common/common.providers';
+import { AppProvidersToken } from 'src/config/app.provider.token';
 
 @Injectable()
 export class UsersService {
   constructor(
-    @Inject(UUID_GENERATOR) private readonly uuid: () => string,
+    @Inject(AppProvidersToken.UUID_GENERATOR) private readonly uuid: () => string,
   ) {}
 
   createUser() {

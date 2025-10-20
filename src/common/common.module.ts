@@ -6,6 +6,6 @@ import { commonProviders } from './common.providers';
 @Global()
 @Module({
     providers: commonProviders,
-    exports: [commonProviders[0]],
+    exports: commonProviders,
   })
 export class CommonModule {}

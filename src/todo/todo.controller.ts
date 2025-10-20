@@ -1,4 +1,4 @@
-import { Body, Controller, Post, Put, Param, Delete, Get, Query } from '@nestjs/common';
+import { Body, Controller, Post, Put, Param, Delete, Get, Query, Patch } from '@nestjs/common';
 import { TodoService } from './todo.service';
 import { TodoEntity } from './entities/todo.entity';
 import { CreateTodoDto } from './dto/create-todo.dto';
@@ -13,17 +13,24 @@ export class TodoController {
     getTodos(@Query() searchFilter: searchFilterDto): Promise<PaginationResult<TodoEntity>> {
         return this.todoService.getTodosWithQbuilder(searchFilter);
     }
-
-    @Get(':id')
-    getTodo(@Param('id') id: number): Promise<TodoEntity> {
-        return this.todoService.getTodo(id);
+    
+    @Get('count')
+    getTodoCountByStatus() {
+        return this.todoService.getTodoCountByStatus()
     }
+
+    
 
     @Post()
     addTodo(@Body() todo: CreateTodoDto): Promise<TodoEntity> {
         return this.todoService.addTodo(todo);
     }
 
+
+    @Get(':id')
+    getTodo(@Param('id') id: number): Promise<TodoEntity> {
+        return this.todoService.getTodo(id);
+    }
     @Put(':id')
     updateTodo(@Body() updatedTodo: UpdateTodoDto, @Param('id') id: number): Promise<TodoEntity> {
         return this.todoService.updateTodo(id, updatedTodo)
@@ -51,13 +58,10 @@ export class TodoController {
 
     
 
-    @Delete('restore/:id')
+    @Patch('restore/:id')
     restoreTodo(@Param('id') id: number) {
         return this.todoService.restoreTodo(id)
     }
 
-    @Get('count')
-    getTodoCountByStatus() {
-        return this.todoService.getTodoCountByStatus()
-    }
+    
 }
